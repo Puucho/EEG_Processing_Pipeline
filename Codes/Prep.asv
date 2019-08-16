@@ -1,0 +1,57 @@
+clear
+%% Prep
+JumlahDomain = 8; %E.g. Digibrain = 8, ZTPI = 5
+Alat = 'Emotiv'
+%Alat = Deymed
+Resolusi = 1080
+
+PathMain = '\0-Brain-Data_Programs\0-Processing Folders\EEGLAB\';
+    PathRAW = [PathMain '0-RawFiles\']; %WAJIB diakhiri dengan '\'
+    PathCUT = [PathMain '1-CutFiles\']; %Path "CutFiles" untuk syntax save file di bawah
+    PathPROC = [PathMain '2-PPFiles\'];
+    PathPLOT = [PathMain '3-Plot Single\'];
+    PathFULLPLOT = [PathMain '4-Plot All\']
+    PathPOWER = [PathMain '5-Power\']
+TimingTable = dir([PathMain '*.xlsx']); 
+rawDataFiles = dir([PathRAW '*.edf']); %baca File rawData as .edf
+
+if Alat == 'Emotiv'
+	nchannels = 14
+	CHLocs = '\0-Brain-Data_Programs\MatLab\eeglab\sample_locs\emotivupdated.ced';
+	ChanNum = [3:16]
+else
+	nchannels = 19
+	CHLocs
+	ChanNum = [1:19]
+end
+%Cut Frame on 1920x1080
+if Resolusi == 1080 
+	
+	deltaFrame = [254 667 222 217];
+	thetaFrame = [564 667 222 217];
+	alphaFrame = [874 667 222 217];
+	betaFrame  = [1184 667 222 217];
+	gammaFrame = [1494 667 222 217];
+	
+%Cut Frame on 1366x768
+else
+	deltaFrame = [181 455 154 154];
+	thetaFrame = [401 455 154 154];
+	alphaFrame = [622 455 154 154];
+	betaFrame  = [842 455 154 154];
+	gammaFrame = [1062 455 154 154];
+
+end
+run '\0-Brain-Data_Programs\MatLab\eeglab\eeglab'; %Masukin path EEGLab
+close;
+%Change th option to use double precision
+pop_editoptions( 'option_storedisk', 0, 'option_savetwofiles', 1,...
+        'option_saveversion6', 1, 'option_single', 0, 'option_memmapdata', 0,...
+        'option_eegobject', 0, 'option_computeica', 1, 'option_scaleicarms', 1,...
+        'option_rememberfolder', 1, 'option_donotusetoolboxes', 0,...
+        'option_checkversion', 1, 'option_chat', 0);
+
+%run 'Cutting_EDF'
+%run 'PreProc'
+run 'Power'
+run 'Plot'
